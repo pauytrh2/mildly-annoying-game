@@ -158,21 +158,32 @@ async fn main() {
                         && b.y <= world_offset_y + screen_height()
                 });
 
-                bullets.retain(|bullet| {
-                    let mut hit_enemy = false;
-                    enemies.retain(|enemy| {
+                let mut bullets_to_remove = Vec::new();
+                let mut enemies_to_remove = Vec::new();
+
+                for (bi, bullet) in bullets.iter().enumerate() {
+                    for (ei, enemy) in enemies.iter().enumerate() {
                         let enemy_rect = Rect::new(enemy.x, enemy.y, enemy.width, enemy.height);
                         let bullet_point = Vec2::new(bullet.x, bullet.y);
+
                         if enemy_rect.contains(bullet_point) {
-                            hit_enemy = true;
+                            bullets_to_remove.push(bi);
+                            enemies_to_remove.push(ei);
                             kills += 1;
-                            false
-                        } else {
-                            true
+                            break;
                         }
-                    });
-                    !hit_enemy
-                });
+                    }
+                }
+
+                bullets_to_remove.sort_unstable_by(|a, b| b.cmp(a));
+                for i in bullets_to_remove {
+                    bullets.remove(i);
+                }
+
+                enemies_to_remove.sort_unstable_by(|a, b| b.cmp(a));
+                for i in enemies_to_remove {
+                    enemies.remove(i);
+                }
 
                 let player_rect = Rect::new(
                     player_x - PLAYER_WIDTH / 2.0,
