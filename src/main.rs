@@ -31,6 +31,7 @@ async fn main() {
     const PLAYER_HEIGHT: f32 = 50.0;
 
     let mut game_state = GameState::Playing;
+    let mut elapsed_time: f32 = 0.0;
 
     let mut world_offset_x: f32 = 0.0;
     let mut world_offset_y: f32 = 0.0;
@@ -60,6 +61,7 @@ async fn main() {
         match game_state {
             GameState::Playing => {
                 spawn_timer += dt;
+                elapsed_time += dt;
 
                 let mouse_pos = mouse_position();
                 let mouse_world_x = mouse_pos.0 + world_offset_x;
@@ -98,34 +100,39 @@ async fn main() {
                     spawn_timer = 0.0;
                     let mut rng = rng();
 
-                    let safe_distance = 100.0;
-                    let mut x;
-                    let mut y;
+                    let extra_enemies = (elapsed_time / 10.0).floor() as usize;
+                    let num_enemies_to_spawn = 1 + extra_enemies.min(5);
 
-                    loop {
-                        let angle = rng.random_range(0.0..std::f32::consts::TAU);
-                        let distance = rng.random_range(safe_distance..300.0);
-                        let player_world_x = player_x + world_offset_x;
-                        let player_world_y = player_y + world_offset_y;
+                    for _ in 0..num_enemies_to_spawn {
+                        let safe_distance = 100.0;
+                        let mut x;
+                        let mut y;
 
-                        x = player_world_x + distance * angle.cos();
-                        y = player_world_y + distance * angle.sin();
+                        loop {
+                            let angle = rng.random_range(0.0..std::f32::consts::TAU);
+                            let distance = rng.random_range(safe_distance..300.0);
+                            let player_world_x = player_x + world_offset_x;
+                            let player_world_y = player_y + world_offset_y;
 
-                        let dx = x - player_world_x;
-                        let dy = y - player_world_y;
-                        if (dx * dx + dy * dy).sqrt() >= safe_distance {
-                            break;
+                            x = player_world_x + distance * angle.cos();
+                            y = player_world_y + distance * angle.sin();
+
+                            let dx = x - player_world_x;
+                            let dy = y - player_world_y;
+                            if (dx * dx + dy * dy).sqrt() >= safe_distance {
+                                break;
+                            }
                         }
-                    }
 
-                    enemies.push(Enemy {
-                        x,
-                        y,
-                        width: 30.0,
-                        height: 30.0,
-                        color: DARKPURPLE,
-                        speed: 100.0,
-                    });
+                        enemies.push(Enemy {
+                            x,
+                            y,
+                            width: 30.0,
+                            height: 30.0,
+                            color: DARKPURPLE,
+                            speed: 100.0,
+                        });
+                    }
                 }
 
                 if is_mouse_button_pressed(MouseButton::Left) {
@@ -347,6 +354,7 @@ async fn main() {
                     arrow_angle = 0.0;
                     kills = 0;
                     game_state = GameState::Playing;
+                    elapsed_time = 0.0;
                 }
             }
         }
