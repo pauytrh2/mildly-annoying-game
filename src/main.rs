@@ -1,29 +1,10 @@
 use ::rand::{Rng, rng};
 use macroquad::prelude::*;
+use utils::*;
+use entities::*;
 
-struct Enemy {
-    x: f32,
-    y: f32,
-    width: f32,
-    height: f32,
-    color: Color,
-    speed: f32,
-}
-
-struct Bullet {
-    x: f32,
-    y: f32,
-    radius: f32,
-    speed: f32,
-    color: Color,
-    direction_x: f32,
-    direction_y: f32,
-}
-
-enum GameState {
-    Playing,
-    GameOver,
-}
+mod utils;
+mod entities;
 
 #[macroquad::main("Game")]
 async fn main() {
@@ -154,8 +135,7 @@ async fn main() {
                 }
 
                 for bullet in &mut bullets {
-                    bullet.x += bullet.direction_x * bullet.speed * dt;
-                    bullet.y += bullet.direction_y * bullet.speed * dt;
+                    bullet.update(dt);
                 }
 
                 bullets.retain(|b| {
@@ -215,36 +195,15 @@ async fn main() {
                 let player_world_y = player_y + world_offset_y;
 
                 for enemy in &mut enemies {
-                    let dx = player_world_x - enemy.x;
-                    let dy = player_world_y - enemy.y;
-                    let distance = (dx * dx + dy * dy).sqrt();
-
-                    if distance > 1.0 {
-                        let dir_x = dx / distance;
-                        let dir_y = dy / distance;
-
-                        enemy.x += dir_x * enemy.speed * dt;
-                        enemy.y += dir_y * enemy.speed * dt;
-                    }
+                    enemy.update(player_world_x, player_world_y, dt);
                 }
 
                 for enemy in &enemies {
-                    draw_rectangle(
-                        enemy.x - world_offset_x,
-                        enemy.y - world_offset_y,
-                        enemy.width,
-                        enemy.height,
-                        enemy.color,
-                    );
+                    enemy.draw(world_offset_x, world_offset_y);
                 }
 
                 for bullet in &bullets {
-                    draw_circle(
-                        bullet.x - world_offset_x,
-                        bullet.y - world_offset_y,
-                        bullet.radius,
-                        bullet.color,
-                    );
+                    bullet.draw(world_offset_x, world_offset_y);
                 }
 
                 draw_rectangle(
@@ -361,17 +320,4 @@ async fn main() {
 
         next_frame().await;
     }
-}
-
-fn lerp_angle(a: f32, b: f32, t: f32) -> f32 {
-    let diff =
-        (b - a + std::f32::consts::PI * 3.0) % (std::f32::consts::PI * 2.0) - std::f32::consts::PI;
-    a + diff * t
-}
-
-fn rotate_point(p: Vec2, angle: f32) -> Vec2 {
-    Vec2::new(
-        p.x * angle.cos() - p.y * angle.sin(),
-        p.x * angle.sin() + p.y * angle.cos(),
-    )
 }
