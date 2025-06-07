@@ -1,4 +1,7 @@
-use macroquad::{color::Color, shapes::{draw_circle, draw_rectangle}};
+use macroquad::{
+    color::Color,
+    shapes::{draw_circle, draw_rectangle},
+};
 
 pub struct Bullet {
     pub x: f32,
@@ -17,7 +20,12 @@ impl Bullet {
     }
 
     pub fn draw(&self, offset_x: f32, offset_y: f32) {
-        draw_circle(self.x - offset_x, self.y - offset_y, self.radius, self.color);
+        draw_circle(
+            self.x - offset_x,
+            self.y - offset_y,
+            self.radius,
+            self.color,
+        );
     }
 }
 

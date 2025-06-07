@@ -1,16 +1,13 @@
 use ::rand::{Rng, rng};
+use entities::*;
 use macroquad::prelude::*;
 use utils::*;
-use entities::*;
 
-mod utils;
 mod entities;
+mod utils;
 
 #[macroquad::main("Game")]
 async fn main() {
-    const PLAYER_WIDTH: f32 = 50.0;
-    const PLAYER_HEIGHT: f32 = 50.0;
-
     let mut game_state = GameState::Playing;
     let mut elapsed_time: f32 = 0.0;
 
@@ -20,21 +17,26 @@ async fn main() {
     let mut vel_x: f32 = 0.0;
     let mut vel_y: f32 = 0.0;
 
-    const ACCELERATION: f32 = 0.5;
-    const MAX_SPEED: f32 = 10.0;
-    const FRICTION: f32 = 0.2;
-
     let mut enemies: Vec<Enemy> = Vec::new();
     let mut bullets: Vec<Bullet> = Vec::new();
     let mut arrow_angle: f32 = 0.0;
     let mut kills: u32 = 0;
 
     let mut spawn_timer: f32 = 0.0;
-    const ENEMY_SPAWN_INTERVAL: f32 = 2.0;
+
+    let background_texture: Texture2D = load_texture("src/assets/background.png").await.unwrap();
 
     loop {
         let dt = get_frame_time();
         clear_background(LIGHTGRAY);
+
+        draw_background(
+            &background_texture,
+            world_offset_x,
+            world_offset_y,
+            screen_width(),
+            screen_height(),
+        );
 
         let player_x: f32 = screen_width() / 2.0;
         let player_y: f32 = screen_height() / 2.0;
@@ -283,21 +285,7 @@ async fn main() {
             }
 
             GameState::GameOver => {
-                draw_text(
-                    "GAME OVER",
-                    screen_width() / 2.0 - 120.0,
-                    screen_height() / 2.0,
-                    48.0,
-                    RED,
-                );
-                draw_text(
-                    "Press any key or click to restart",
-                    screen_width() / 2.0 - 200.0,
-                    screen_height() / 2.0 + 50.0,
-                    24.0,
-                    DARKGRAY,
-                );
-
+                game_over_screen();
                 if is_key_pressed(KeyCode::Space)
                     || is_mouse_button_pressed(MouseButton::Left)
                     || is_key_pressed(KeyCode::Enter)
