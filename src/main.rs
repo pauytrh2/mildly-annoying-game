@@ -119,13 +119,31 @@ async fn main() {
                         let mut y;
 
                         loop {
-                            let angle = rng.random_range(0.0..std::f32::consts::TAU);
-                            let distance = rng.random_range(safe_distance..300.0);
                             let player_world_x = player_x + world_offset_x;
                             let player_world_y = player_y + world_offset_y;
 
-                            x = player_world_x + distance * angle.cos();
-                            y = player_world_y + distance * angle.sin();
+                            let screen_w = screen_width();
+                            let screen_h = screen_height();
+
+                            let spawn_margin = 100.0;
+                            let spawn_area_min_x = player_world_x - screen_w / 2.0 - spawn_margin;
+                            let spawn_area_max_x = player_world_x + screen_w / 2.0 + spawn_margin;
+                            let spawn_area_min_y = player_world_y - screen_h / 2.0 - spawn_margin;
+                            let spawn_area_max_y = player_world_y + screen_h / 2.0 + spawn_margin;
+
+                            loop {
+                                x = rng.random_range(spawn_area_min_x..spawn_area_max_x);
+                                y = rng.random_range(spawn_area_min_y..spawn_area_max_y);
+
+                                let in_view_x = x >= player_world_x - screen_w / 2.0
+                                    && x <= player_world_x + screen_w / 2.0;
+                                let in_view_y = y >= player_world_y - screen_h / 2.0
+                                    && y <= player_world_y + screen_h / 2.0;
+
+                                if !(in_view_x && in_view_y) {
+                                    break;
+                                }
+                            }
 
                             let dx = x - player_world_x;
                             let dy = y - player_world_y;
