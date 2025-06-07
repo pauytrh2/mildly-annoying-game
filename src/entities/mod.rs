@@ -1,6 +1,8 @@
 use macroquad::{
-    color::Color,
-    shapes::{draw_circle, draw_rectangle},
+    color::{Color, WHITE},
+    math::vec2,
+    shapes::draw_circle,
+    texture::{DrawTextureParams, Texture2D, draw_texture_ex},
 };
 
 pub struct Bullet {
@@ -34,8 +36,8 @@ pub struct Enemy {
     pub y: f32,
     pub width: f32,
     pub height: f32,
-    pub color: Color,
     pub speed: f32,
+    pub texture: Texture2D,
 }
 
 impl Enemy {
@@ -51,12 +53,15 @@ impl Enemy {
     }
 
     pub fn draw(&self, offset_x: f32, offset_y: f32) {
-        draw_rectangle(
+        draw_texture_ex(
+            &self.texture,
             self.x - offset_x,
             self.y - offset_y,
-            self.width,
-            self.height,
-            self.color,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(self.width, self.height)),
+                ..Default::default()
+            },
         );
     }
 }

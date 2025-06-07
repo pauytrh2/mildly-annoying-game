@@ -7,7 +7,7 @@ use macroquad::{
 };
 
 pub const ACCELERATION: f32 = 0.5;
-pub const MAX_SPEED: f32 = 10.0;
+pub const MAX_SPEED: f32 = 8.0;
 pub const FRICTION: f32 = 0.2;
 pub const ENEMY_SPAWN_INTERVAL: f32 = 2.0;
 pub const PLAYER_WIDTH: f32 = 50.0;

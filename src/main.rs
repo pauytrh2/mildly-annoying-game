@@ -24,7 +24,12 @@ async fn main() {
 
     let mut spawn_timer: f32 = 0.0;
 
-    let background_texture: Texture2D = load_texture("src/assets/background.png").await.unwrap();
+    let background_texture: Texture2D = load_texture("src/assets/background/background.png")
+        .await
+        .unwrap();
+    let enemy_texture: Texture2D = load_texture("src/assets/entity/enemy/enemy.png")
+        .await
+        .unwrap();
 
     loop {
         let dt = get_frame_time();
@@ -110,10 +115,10 @@ async fn main() {
                         enemies.push(Enemy {
                             x,
                             y,
-                            width: 30.0,
-                            height: 30.0,
-                            color: DARKPURPLE,
+                            width: 50.0,
+                            height: 50.0,
                             speed: 100.0,
+                            texture: enemy_texture.clone(),
                         });
                     }
                 }
