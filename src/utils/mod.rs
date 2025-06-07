@@ -1,5 +1,5 @@
 use macroquad::{
-    color::{RED, WHITE},
+    color::{BLACK, RED, WHITE},
     prelude::{Vec2, vec2},
     text::draw_text,
     texture::{Texture2D, draw_texture},
@@ -7,7 +7,7 @@ use macroquad::{
 };
 use rand::{Rng, rng};
 
-use crate::entities::Enemy;
+use crate::entities::{Bullet, Enemy};
 
 pub const ACCELERATION: f32 = 0.5;
 pub const MAX_SPEED: f32 = 8.0;
@@ -140,4 +140,30 @@ pub fn spawn_enemies(
             texture: enemy_texture.clone(),
         });
     }
+}
+
+pub fn launch_bullet(
+    mouse_world_x: f32,
+    mouse_world_y: f32,
+    player_x: f32,
+    player_y: f32,
+    world_offset_x: f32,
+    world_offset_y: f32,
+    bullets: &mut Vec<Bullet>,
+) {
+    let dir_x = mouse_world_x - (player_x + world_offset_x);
+    let dir_y = mouse_world_y - (player_y + world_offset_y);
+    let length = (dir_x * dir_x + dir_y * dir_y).sqrt();
+    let norm_dir_x = dir_x / length;
+    let norm_dir_y = dir_y / length;
+
+    bullets.push(Bullet {
+        x: player_x + world_offset_x,
+        y: player_y + world_offset_y,
+        radius: 5.0,
+        speed: 500.0,
+        color: BLACK,
+        direction_x: norm_dir_x,
+        direction_y: norm_dir_y,
+    });
 }

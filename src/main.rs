@@ -119,21 +119,15 @@ async fn main() {
                 }
 
                 if is_mouse_button_pressed(MouseButton::Left) {
-                    let dir_x = mouse_world_x - (player_x + world_offset_x);
-                    let dir_y = mouse_world_y - (player_y + world_offset_y);
-                    let length = (dir_x * dir_x + dir_y * dir_y).sqrt();
-                    let norm_dir_x = dir_x / length;
-                    let norm_dir_y = dir_y / length;
-
-                    bullets.push(Bullet {
-                        x: player_x + world_offset_x,
-                        y: player_y + world_offset_y,
-                        radius: 5.0,
-                        speed: 500.0,
-                        color: BLACK,
-                        direction_x: norm_dir_x,
-                        direction_y: norm_dir_y,
-                    });
+                    launch_bullet(
+                        mouse_world_x,
+                        mouse_world_y,
+                        player_x,
+                        player_y,
+                        world_offset_x,
+                        world_offset_y,
+                        &mut bullets,
+                    );
                 }
 
                 for bullet in &mut bullets {
