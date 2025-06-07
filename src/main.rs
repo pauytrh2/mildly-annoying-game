@@ -23,6 +23,7 @@ async fn main() {
     let mut kills: u32 = 0;
 
     let mut spawn_timer: f32 = 0.0;
+    let mut dev_mode = false;
 
     let background_texture: Texture2D = load_texture("src/assets/background/background.png")
         .await
@@ -48,6 +49,12 @@ async fn main() {
 
         match game_state {
             GameState::Playing => {
+                if is_key_pressed(KeyCode::GraveAccent) {
+                    dev_mode = !dev_mode;
+                    vel_x = 0.0;
+                    vel_y = 0.0;
+                }
+
                 spawn_timer += dt;
                 elapsed_time += dt;
 
@@ -55,31 +62,46 @@ async fn main() {
                 let mouse_world_x = mouse_pos.0 + world_offset_x;
                 let mouse_world_y = mouse_pos.1 + world_offset_y;
 
-                let dir_x = mouse_world_x - (player_x + world_offset_x);
-                let dir_y = mouse_world_y - (player_y + world_offset_y);
-                let dist = (dir_x * dir_x + dir_y * dir_y).sqrt();
+                if dev_mode {
+                    if is_key_down(KeyCode::W) {
+                        vel_y -= ACCELERATION;
+                    }
+                    if is_key_down(KeyCode::S) {
+                        vel_y += ACCELERATION;
+                    }
+                    if is_key_down(KeyCode::A) {
+                        vel_x -= ACCELERATION;
+                    }
+                    if is_key_down(KeyCode::D) {
+                        vel_x += ACCELERATION;
+                    }
+                } else {
+                    let dir_x = mouse_world_x - (player_x + world_offset_x);
+                    let dir_y = mouse_world_y - (player_y + world_offset_y);
+                    let dist = (dir_x * dir_x + dir_y * dir_y).sqrt();
 
-                if dist > 1.0 {
-                    let norm_dir_x = dir_x / dist;
-                    let norm_dir_y = dir_y / dist;
+                    if dist > 1.0 {
+                        let norm_dir_x = dir_x / dist;
+                        let norm_dir_y = dir_y / dist;
 
-                    vel_x += norm_dir_x * ACCELERATION;
-                    vel_y += norm_dir_y * ACCELERATION;
+                        vel_x += norm_dir_x * ACCELERATION;
+                        vel_y += norm_dir_y * ACCELERATION;
+                    }
+
+                    if dist <= 1.0 {
+                        vel_x = (vel_x - vel_x.signum() * FRICTION).clamp(-MAX_SPEED, MAX_SPEED);
+                        if vel_x.abs() < FRICTION {
+                            vel_x = 0.0;
+                        }
+                        vel_y = (vel_y - vel_y.signum() * FRICTION).clamp(-MAX_SPEED, MAX_SPEED);
+                        if vel_y.abs() < FRICTION {
+                            vel_y = 0.0;
+                        }
+                    }
                 }
 
                 vel_x = vel_x.clamp(-MAX_SPEED, MAX_SPEED);
                 vel_y = vel_y.clamp(-MAX_SPEED, MAX_SPEED);
-
-                if dist <= 1.0 {
-                    vel_x = (vel_x - vel_x.signum() * FRICTION).clamp(-MAX_SPEED, MAX_SPEED);
-                    if vel_x.abs() < FRICTION {
-                        vel_x = 0.0;
-                    }
-                    vel_y = (vel_y - vel_y.signum() * FRICTION).clamp(-MAX_SPEED, MAX_SPEED);
-                    if vel_y.abs() < FRICTION {
-                        vel_y = 0.0;
-                    }
-                }
 
                 world_offset_x += vel_x;
                 world_offset_y += vel_y;
@@ -193,7 +215,7 @@ async fn main() {
                         enemy.width,
                         enemy.height,
                     );
-                    if player_rect.overlaps(&enemy_rect) {
+                    if player_rect.overlaps(&enemy_rect) && !dev_mode {
                         game_state = GameState::GameOver;
                     }
                 }
@@ -236,6 +258,10 @@ async fn main() {
                     DARKGRAY,
                 );
 
+                if dev_mode {
+                    draw_text("DEV MODE ENABLED", 20.0, 100.0, 24.0, ORANGE);
+                }
+
                 if let Some(closest_enemy) = enemies.iter().min_by(|a, b| {
                     let da = (a.x - (player_x + world_offset_x))
                         .hypot(a.y - (player_y + world_offset_y));
@@ -271,7 +297,7 @@ async fn main() {
                     draw_rectangle(square_pos_x, square_pos_y, square_size, square_size, BLACK);
                 }
 
-                let move_dir_angle = dir_y.atan2(dir_x);
+                let move_dir_angle = vel_y.atan2(vel_x);
 
                 let tri_pos_x = 40.0;
                 let tri_pos_y = screen_height() - 40.0;
