@@ -248,14 +248,14 @@ async fn main() {
                     20.0,
                     40.0,
                     24.0,
-                    DARKGRAY,
+                    PURPLE,
                 );
                 draw_text(
                     &format!("Enemies killed: {}", kills),
                     20.0,
                     70.0,
                     24.0,
-                    DARKGRAY,
+                    PURPLE,
                 );
 
                 if dev_mode {
@@ -290,11 +290,11 @@ async fn main() {
                     let rp3 = rotate_point(p3, arrow_angle) + vec2(arrow_pos_x, arrow_pos_y);
                     draw_triangle(rp1, rp2, rp3, BLACK);
                 } else {
-                    let square_pos_x = player_x - 10.0;
-                    let square_pos_y = player_y - PLAYER_HEIGHT / 2.0 - 30.0;
-                    let square_size = 20.0;
+                    let circle_pos_x = player_x;
+                    let circle_pos_y = player_y - PLAYER_HEIGHT / 2.0 - 20.0;
+                    let circle_size = 10.0;
 
-                    draw_rectangle(square_pos_x, square_pos_y, square_size, square_size, BLACK);
+                    draw_circle(circle_pos_x, circle_pos_y, circle_size, BLACK);
                 }
 
                 let move_dir_angle = vel_y.atan2(vel_x);
