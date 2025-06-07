@@ -137,8 +137,8 @@ async fn main() {
                         enemies.push(Enemy {
                             x,
                             y,
-                            width: 50.0,
-                            height: 50.0,
+                            width: 40.0,
+                            height: 40.0,
                             speed: 100.0,
                             texture: enemy_texture.clone(),
                         });
