@@ -1,5 +1,5 @@
 use macroquad::{
-    color::{BLACK, RED, WHITE},
+    color::{RED, WHITE},
     prelude::{Vec2, vec2},
     text::draw_text,
     texture::{Texture2D, draw_texture},
@@ -162,7 +162,7 @@ pub fn launch_bullet(
         y: player_y + world_offset_y,
         radius: 5.0,
         speed: 500.0,
-        color: BLACK,
+        color: WHITE,
         direction_x: norm_dir_x,
         direction_y: norm_dir_y,
     });
