@@ -1,5 +1,6 @@
 use entities::*;
 use macroquad::prelude::*;
+use std::collections::HashSet;
 use utils::*;
 
 mod entities;
@@ -141,31 +142,41 @@ async fn main() {
                         && b.y <= world_offset_y + screen_height()
                 });
 
-                let mut bullets_to_remove = Vec::new();
-                let mut enemies_to_remove = Vec::new();
+                let mut bullets_to_remove = HashSet::new();
+                let mut enemies_to_remove = HashSet::new();
 
                 for (bi, bullet) in bullets.iter().enumerate() {
                     for (ei, enemy) in enemies.iter().enumerate() {
+                        if bullets_to_remove.contains(&bi) || enemies_to_remove.contains(&ei) {
+                            continue;
+                        }
+
                         let enemy_rect = Rect::new(enemy.x, enemy.y, enemy.width, enemy.height);
                         let bullet_point = Vec2::new(bullet.x, bullet.y);
 
                         if enemy_rect.contains(bullet_point) {
-                            bullets_to_remove.push(bi);
-                            enemies_to_remove.push(ei);
+                            bullets_to_remove.insert(bi);
+                            enemies_to_remove.insert(ei);
                             kills += 1;
                             break;
                         }
                     }
                 }
 
-                bullets_to_remove.sort_unstable_by(|a, b| b.cmp(a));
-                for i in bullets_to_remove {
-                    bullets.remove(i);
+                let mut bullet_indices: Vec<usize> = bullets_to_remove.into_iter().collect();
+                bullet_indices.sort_unstable_by(|a, b| b.cmp(a));
+                for i in bullet_indices {
+                    if i < bullets.len() {
+                        bullets.remove(i);
+                    }
                 }
 
-                enemies_to_remove.sort_unstable_by(|a, b| b.cmp(a));
-                for i in enemies_to_remove {
-                    enemies.remove(i);
+                let mut enemy_indices: Vec<usize> = enemies_to_remove.into_iter().collect();
+                enemy_indices.sort_unstable_by(|a, b| b.cmp(a));
+                for i in enemy_indices {
+                    if i < enemies.len() {
+                        enemies.remove(i);
+                    }
                 }
 
                 let player_rect = Rect::new(
